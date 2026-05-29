@@ -608,19 +608,16 @@
 
   <script>
     /*****************************************************************
-     * MODI / UNLEGACY tracking script
-     * Records anonymous visit events to Google Apps Script Web App.
+     * MODI / UNLEGACY Supabase tracking script
+     * Records anonymous visit events to Supabase table: album_events
      *****************************************************************/
-    const TRACKING_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxiMV47C3fZQr81W-KkrMzGVAmqDfEy_sBO_sfhWEc9fQKrHN3afMubAC4OymZhCAbY/exec';
+    const SUPABASE_URL = 'https://nuckgnididziqlcifwke.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_4WHwghJkjjB5yN6N2WHacQ_ymWnpovu';
+    const TRACKING_TABLE = 'album_events';
 
     const NOTION_URL = 'https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b';
     const pageParams = new URLSearchParams(window.location.search);
     const DEBUG_TRACKING = pageParams.get('debug') === '1';
-
-    function debugLogTracking(message, data) {
-      if (!DEBUG_TRACKING) return;
-      console.log('[MODI tracking]', message, data || '');
-    }
 
     const campaign = {
       to: pageParams.get('to') || pageParams.get('recipient') || 'unknown',
@@ -629,6 +626,11 @@
       campaign: pageParams.get('utm_campaign') || '',
       content: pageParams.get('utm_content') || ''
     };
+
+    function debugLogTracking(message, data) {
+      if (!DEBUG_TRACKING) return;
+      console.log('[MODI Supabase tracking]', message, data || '');
+    }
 
     function safeRandomId(prefix) {
       if (window.crypto && typeof window.crypto.randomUUID === 'function') {
@@ -688,128 +690,164 @@
       };
     }
 
-    // Keep tracking requests alive. Some browsers may cancel a locally scoped
-    // Image() request too aggressively, so we append it to a hidden container
-    // and remove it only after the request has had enough time to complete.
-    window.__modiTrackingBeacons = window.__modiTrackingBeacons || [];
-
-    function getBeaconContainer() {
-      let container = document.getElementById('modi-tracking-beacons');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'modi-tracking-beacons';
-        container.setAttribute('aria-hidden', 'true');
-        container.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;left:-9999px;top:-9999px;';
-        document.body.appendChild(container);
-      }
-      return container;
-    }
-
-    function track(eventName, value = '', props = {}) {
-      const elapsedSeconds = Math.round((Date.now() - pageStartedAt) / 1000);
-      const payload = new URLSearchParams({
-        vid: visitorId,
-        sid: sessionId,
-        to: campaign.to,
-        event: eventName,
-        value: String(value ?? ''),
-        page: location.pathname,
-        ref: document.referrer || '',
-        url: location.href,
-        ua: navigator.userAgent || '',
-        props: JSON.stringify({
-          ...campaign,
-          elapsedSeconds,
-          ...props
-        }),
-        // Cache buster. Without this, repeated GET/image requests can be cached
-        // by browser or intermediary cache and may not hit Apps Script every time.
-        _ts: String(Date.now()),
-        _r: Math.random().toString(36).slice(2)
-      });
-
-      const requestUrl = TRACKING_ENDPOINT + '?' + payload.toString();
-      debugLogTracking('send', { eventName, recipient: campaign.to, requestUrl });
-
-      const beacon = new Image(1, 1);
-      beacon.referrerPolicy = 'no-referrer-when-downgrade';
-      beacon.alt = '';
-      beacon.style.cssText = 'width:1px;height:1px;opacity:0;position:absolute;pointer-events:none;';
-
-      const cleanup = () => {
-        window.setTimeout(() => {
-          const index = window.__modiTrackingBeacons.indexOf(beacon);
-          if (index >= 0) window.__modiTrackingBeacons.splice(index, 1);
-          if (beacon.parentNode) beacon.parentNode.removeChild(beacon);
-        }, 3000);
-      };
-
-      beacon.onload = cleanup;
-      beacon.onerror = cleanup;
-
-      window.__modiTrackingBeacons.push(beacon);
-      getBeaconContainer().appendChild(beacon);
-      beacon.src = requestUrl;
-    }
-
-    track('page_view', '', getDeviceInfo());
-
-    // Time-on-page milestones
-    [5, 10, 30, 60, 120, 180].forEach(seconds => {
-      window.setTimeout(() => {
-        track(`stay_${seconds}s`, seconds);
-      }, seconds * 1000);
-    });
-
-    // Scroll depth milestones
-    const reachedScroll = new Set();
-    function recordScrollDepth() {
+    function getScrollDepth() {
       const doc = document.documentElement;
-      const scrollTop = window.scrollY || doc.scrollTop;
-      const viewportHeight = window.innerHeight || doc.clientHeight;
+      const scrollTop = window.scrollY || doc.scrollTop || 0;
+      const viewportHeight = window.innerHeight || doc.clientHeight || 0;
       const fullHeight = Math.max(
         doc.scrollHeight,
         document.body.scrollHeight,
         doc.offsetHeight,
         document.body.offsetHeight
       );
-      const depth = Math.min(100, Math.round(((scrollTop + viewportHeight) / fullHeight) * 100));
 
-      [25, 50, 75, 90, 100].forEach(threshold => {
-        if (depth >= threshold && !reachedScroll.has(threshold)) {
-          reachedScroll.add(threshold);
-          track(`scroll_${threshold}`, threshold);
-        }
-      });
+      if (!fullHeight || fullHeight <= viewportHeight) {
+        return 100;
+      }
+
+      return Math.min(100, Math.round(((scrollTop + viewportHeight) / fullHeight) * 100));
     }
+
+    function normalizeEventName(rawEventName) {
+      const name = String(rawEventName || '').trim();
+
+      if (name === 'page_view' || name === 'page_exit' || name === 'page_hide' || name === 'page_show') return name;
+      if (/^stay_(5|10|30|60|120|180)s$/.test(name)) return name;
+      if (/^scroll_(25|50|75|90|100)$/.test(name)) return name;
+      if (name === 'section_view' || name.startsWith('view_section_')) return 'section_view';
+      if (name.startsWith('click_open_notion')) return 'click_open_notion';
+      if (name === 'click_music') return 'click_music';
+      if (name === 'click_contact' || name === 'click_email' || name === 'click_contact_scroll') return 'click_contact';
+      if (name.startsWith('click_')) return 'click_external';
+
+      return name || 'click_external';
+    }
+
+    async function track(rawEventName, value = '', props = {}) {
+      const normalizedEventName = normalizeEventName(rawEventName);
+      const elapsedSeconds = Math.round((Date.now() - pageStartedAt) / 1000);
+
+      const row = {
+        visitor_id: visitorId,
+        session_id: sessionId,
+        recipient: campaign.to,
+        event_name: normalizedEventName,
+        event_value: String(value ?? ''),
+        page: window.location.pathname,
+        referrer: document.referrer || '',
+        url: window.location.href,
+        user_agent: navigator.userAgent || '',
+        screen_width: window.screen ? window.screen.width : null,
+        screen_height: window.screen ? window.screen.height : null,
+        viewport_width: window.innerWidth || null,
+        viewport_height: window.innerHeight || null,
+        props: {
+          ...campaign,
+          rawEventName,
+          elapsedSeconds,
+          ...props
+        }
+      };
+
+      debugLogTracking('send', row);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TRACKING_TABLE}`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify(row),
+          keepalive: true
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          console.error('[MODI Supabase tracking] failed', response.status, text);
+        } else {
+          debugLogTracking('success', { rawEventName, eventName: normalizedEventName, recipient: campaign.to });
+        }
+      } catch (error) {
+        console.error('[MODI Supabase tracking] error', error);
+      }
+    }
+
+    track('page_view', '', {
+      ...getDeviceInfo(),
+      title: document.title,
+      scrollDepth: getScrollDepth()
+    });
+
+    // Time-on-page milestones
+    [5, 10, 30, 60, 120, 180].forEach(seconds => {
+      window.setTimeout(() => {
+        track(`stay_${seconds}s`, seconds, {
+          scrollDepth: getScrollDepth()
+        });
+      }, seconds * 1000);
+    });
+
+    // Scroll depth milestones
+    const reachedScroll = new Set();
+    let scrollTimer = null;
+
+    function recordScrollDepth() {
+      if (scrollTimer) return;
+
+      scrollTimer = window.setTimeout(() => {
+        scrollTimer = null;
+        const depth = getScrollDepth();
+
+        [25, 50, 75, 90, 100].forEach(threshold => {
+          if (depth >= threshold && !reachedScroll.has(threshold)) {
+            reachedScroll.add(threshold);
+            track(`scroll_${threshold}`, threshold, { depth });
+          }
+        });
+      }, 250);
+    }
+
     window.addEventListener('scroll', recordScrollDepth, { passive: true });
     window.addEventListener('resize', recordScrollDepth);
     recordScrollDepth();
 
     // Section visibility tracking
     const seenSections = new Set();
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const name = entry.target.dataset.section;
-        if (!name || seenSections.has(name)) return;
-        seenSections.add(name);
-        track(`view_section_${name}`, '', { section: name });
-      });
-    }, { threshold: 0.45 });
 
-    document.querySelectorAll('[data-section]').forEach(el => observer.observe(el));
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          const sectionName = entry.target.dataset.section;
+          if (!sectionName || seenSections.has(sectionName)) return;
+
+          seenSections.add(sectionName);
+          track('section_view', sectionName, {
+            section: sectionName
+          });
+        });
+      }, { threshold: 0.45 });
+
+      document.querySelectorAll('[data-section]').forEach(el => observer.observe(el));
+    }
 
     // Click tracking
     document.addEventListener('click', event => {
       const target = event.target.closest('[data-track]');
       if (!target) return;
 
-      track(target.dataset.track, '', {
-        text: (target.innerText || target.textContent || '').trim().slice(0, 120),
+      const rawEventName = target.dataset.track || 'click_external';
+
+      track(rawEventName, '', {
+        text: (target.innerText || target.textContent || '').trim().slice(0, 160),
         href: target.href || '',
         id: target.id || '',
-        classes: target.className || ''
+        classes: target.className || '',
+        scrollDepth: getScrollDepth()
       });
     });
 
@@ -837,6 +875,7 @@
       exitTracked = true;
       track('page_exit', Math.round((Date.now() - pageStartedAt) / 1000), {
         reason,
+        scrollDepth: getScrollDepth(),
         scrollY: Math.round(window.scrollY || 0),
         maxScrollEvents: Array.from(reachedScroll).sort((a, b) => a - b).join(',')
       });

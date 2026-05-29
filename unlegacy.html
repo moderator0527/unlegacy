@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MODI - UNLEGACY Album Proposal</title>
+  <meta name="description" content="MODI의 새 앨범 UNLEGACY 제안서 랜딩 페이지" />
+
+  <meta property="og:title" content="MODI - UNLEGACY Album Proposal" />
+  <meta property="og:description" content="유명해지고 싶은 무명 아티스트 MODI의 새 앨범 제안서" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --panel: rgba(255, 255, 255, 0.075);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f5f7;
+      --muted: rgba(245, 245, 247, 0.66);
+      --muted-2: rgba(245, 245, 247, 0.48);
+      --line: rgba(255, 255, 255, 0.14);
+      --accent: #b8ff5f;
+      --accent-2: #8ce7ff;
+      --danger: #ff6b6b;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max: 1060px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(184, 255, 95, 0.20), transparent 30%),
+        radial-gradient(circle at 85% 8%, rgba(140, 231, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 50% 88%, rgba(255, 255, 255, 0.09), transparent 40%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(11, 11, 13, 0.58);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-inner {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #0a0a0b;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 28px rgba(184, 255, 95, 0.15);
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      padding: 9px 12px;
+      border-radius: 999px;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .hero {
+      padding: 86px 0 54px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 34px;
+      align-items: stretch;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.055);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 22px var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(46px, 7.2vw, 92px);
+      line-height: 0.94;
+      letter-spacing: -0.08em;
+    }
+
+    .hero h1 span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.72);
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.72;
+      letter-spacing: -0.02em;
+    }
+
+    .lead strong {
+      color: var(--text);
+      font-weight: 750;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 50px;
+      padding: 0 19px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.13);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #060708;
+      border: 0;
+      box-shadow: 0 18px 46px rgba(184, 255, 95, 0.18);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #c7ff7a, #a2ecff);
+    }
+
+    .hero-card {
+      position: relative;
+      min-height: 440px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.055)),
+        rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -40% -50% auto auto;
+      width: 330px;
+      height: 330px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184, 255, 95, 0.42), transparent 67%);
+      filter: blur(4px);
+    }
+
+    .album-visual {
+      position: relative;
+      height: 100%;
+      min-height: 390px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 24px;
+      padding: 24px;
+      overflow: hidden;
+      background:
+        linear-gradient(140deg, rgba(0,0,0,0.62), rgba(0,0,0,0.08)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 18px),
+        radial-gradient(circle at 30% 20%, rgba(140,231,255,0.38), transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(184,255,95,0.34), transparent 35%),
+        #141418;
+    }
+
+    .album-title {
+      position: relative;
+      font-size: 15px;
+      color: var(--muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .album-big {
+      position: relative;
+      font-size: clamp(44px, 6vw, 72px);
+      line-height: 0.92;
+      letter-spacing: -0.08em;
+      font-weight: 900;
+    }
+
+    .album-bottom {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .section {
+      padding: 42px 0;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: clamp(28px, 4vw, 48px);
+      letter-spacing: -0.06em;
+    }
+
+    .section-copy {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.82;
+      letter-spacing: -0.02em;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .card {
+      min-height: 190px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.18);
+    }
+
+    .card .num {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: -0.04em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      letter-spacing: -0.02em;
+    }
+
+    .proposal-box {
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 18px;
+      align-items: center;
+      padding: 24px;
+      border: 1px solid rgba(184, 255, 95, 0.30);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(184, 255, 95, 0.18), transparent 34%),
+        rgba(255, 255, 255, 0.075);
+      box-shadow: var(--shadow);
+    }
+
+    .proposal-box h2 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.06em;
+    }
+
+    .proposal-box p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+      letter-spacing: -0.02em;
+    }
+
+    .mini-panel {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .mini-panel dl {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .mini-panel div {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 12px;
+    }
+
+    .mini-panel div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    dt {
+      color: var(--muted-2);
+    }
+
+    dd {
+      margin: 0;
+      text-align: right;
+      font-weight: 750;
+    }
+
+    .footer {
+      padding: 60px 0 34px;
+      color: var(--muted-2);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .privacy {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+      padding: 12px 15px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      color: var(--text);
+      font-size: 13px;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        padding-top: 58px;
+      }
+
+      .hero-grid,
+      .proposal-box {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        min-height: 360px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" data-track="click_brand">
+        <span class="brand-mark">M</span>
+        <span>MODI / UNLEGACY</span>
+      </a>
+      <div class="nav-links">
+        <a href="#story" data-track="click_nav_story">Story</a>
+        <a href="#proposal" data-track="click_nav_proposal">Proposal</a>
+        <a href="#contact" data-track="click_nav_contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> New album proposal from an unknown artist</div>
+          <h1>유명해지고 싶은<br><span>무명 아티스트</span></h1>
+          <p class="lead">
+            저는 <strong>MODI</strong>라는 이름으로 활동하고 있습니다. 지금 준비 중인 새 앨범 <strong>UNLEGACY</strong>는 단순히 음악 몇 곡을 모은 결과물이 아니라, 제가 어떤 사람인지 가장 직접적으로 증명하려는 시도입니다.
+          </p>
+          <div class="cta-row">
+            <a class="btn primary" href="https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b" target="_blank" rel="noopener" data-track="click_open_notion">앨범 제안서 열기 →</a>
+            <a class="btn" href="https://untitled.stream/embed/663AfBuWDUkW" target="_blank" rel="noopener" data-track="click_music">음악 듣기</a>
+            <a class="btn" href="#contact" data-track="click_contact_scroll">연락하기</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="UNLEGACY visual card">
+          <div class="album-visual">
+            <div class="album-title">MODI PRESENTS</div>
+            <div class="album-big">UN<br>LEGACY</div>
+            <div class="album-bottom">
+              <span>ambition / proof / becoming</span>
+              <span>album proposal</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="story" class="section" data-section="story">
+      <div class="wrap">
+        <h2 class="section-title">이 페이지의 목적</h2>
+        <p class="section-copy">
+          이 링크는 제 앨범을 설명하기 위한 짧은 입구입니다. 더 자세한 기획 의도, 트랙 구성, 비주얼 방향, 레퍼런스와 자료는 아래 노션 제안서에 정리되어 있습니다. 먼저 이 페이지에서 감각을 확인한 뒤, 제안서를 열어봐 주세요.
+        </p>
+        <div class="cards">
+          <article class="card" data-section-card="identity">
+            <div class="num">01 / identity</div>
+            <h3>무명이라는 현재</h3>
+            <p>아직 알려지지 않았다는 사실을 숨기지 않고, 오히려 앨범의 출발점으로 삼았습니다.</p>
+          </article>
+          <article class="card" data-section-card="ambition">
+            <div class="num">02 / ambition</div>
+            <h3>유명해지고 싶은 야망</h3>
+            <p>좋은 척, 담담한 척보다 더 중요한 것은 진짜로 올라가고 싶다는 마음이라고 생각합니다.</p>
+          </article>
+          <article class="card" data-section-card="proposal">
+            <div class="num">03 / proposal</div>
+            <h3>읽히기 위한 제안서</h3>
+            <p>메일의 본문을 넘어, 음악과 태도와 방향이 한 번에 보이도록 정리했습니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="proposal" class="section" data-section="proposal">
+      <div class="wrap proposal-box">
+        <div>
+          <h2>전체 앨범 제안서 보기</h2>
+          <p>
+            노션 페이지에는 앨범의 세부 정보가 정리되어 있습니다. 버튼을 누르면 새 탭에서 원본 제안서가 열립니다.
+          </p>
+          <div class="cta-row">
+            <a class="btn primary" href="https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b" target="_blank" rel="noopener" data-track="click_open_notion_mid">노션 제안서 열기 →</a>
+            <button class="btn" type="button" data-copy-link data-track="click_copy_link">링크 복사</button>
+          </div>
+        </div>
+        <div class="mini-panel">
+          <dl>
+            <div>
+              <dt>Artist</dt>
+              <dd>MODI</dd>
+            </div>
+            <div>
+              <dt>Album</dt>
+              <dd>UNLEGACY</dd>
+            </div>
+            <div>
+              <dt>Format</dt>
+              <dd>Proposal</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>In preparation</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section" data-section="contact">
+      <div class="wrap">
+        <h2 class="section-title">연락</h2>
+        <p class="section-copy">
+          제안서나 음악을 확인하신 뒤 의견을 주실 수 있다면 정말 감사하겠습니다. 아래 버튼을 누르면 메일 작성 화면이 열립니다.
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="mailto:teaminvibeofficial@gmail.com?subject=MODI%20-%20UNLEGACY%20Album%20Proposal" data-track="click_email">메일 보내기</a>
+          <a class="btn" href="https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b" target="_blank" rel="noopener" data-track="click_open_notion_bottom">제안서 다시 열기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>© MODI. This page is a private album proposal landing page.</div>
+      <div class="privacy">
+        방문 분석을 위해 익명 방문 ID, 접속 시각, 체류시간, 스크롤 도달률, 버튼 클릭 정보가 기록될 수 있습니다. 이름, 이메일, 전화번호, IP 주소는 이 페이지에서 직접 수집하지 않습니다.
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">링크를 복사했습니다.</div>
+
+  <script>
+    /*****************************************************************
+     * MODI / UNLEGACY tracking script
+     * Records anonymous visit events to Google Apps Script Web App.
+     *****************************************************************/
+    const TRACKING_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEtqXCXMVVp0hChwY5jF-Kx5DiX5BK9dKvdTOl4YC3LvsQ9TUdr0NTms7vwNhYU3Ge/exec';
+
+    const NOTION_URL = 'https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b';
+    const pageParams = new URLSearchParams(window.location.search);
+
+    const campaign = {
+      to: pageParams.get('to') || pageParams.get('recipient') || 'unknown',
+      source: pageParams.get('utm_source') || '',
+      medium: pageParams.get('utm_medium') || '',
+      campaign: pageParams.get('utm_campaign') || '',
+      content: pageParams.get('utm_content') || ''
+    };
+
+    function safeRandomId(prefix) {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return prefix + '_' + window.crypto.randomUUID();
+      }
+      return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 12);
+    }
+
+    function getOrCreateVisitorId() {
+      const key = 'modi_unlegacy_visitor_id';
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = safeRandomId('v');
+        localStorage.setItem(key, id);
+      }
+      return id;
+    }
+
+    function getOrCreateSessionId() {
+      const key = 'modi_unlegacy_session_id';
+      let id = sessionStorage.getItem(key);
+      if (!id) {
+        id = safeRandomId('s');
+        sessionStorage.setItem(key, id);
+      }
+      return id;
+    }
+
+    const visitorId = getOrCreateVisitorId();
+    const sessionId = getOrCreateSessionId();
+    const pageStartedAt = Date.now();
+
+    function getDeviceInfo() {
+      return {
+        screen: window.screen ? `${window.screen.width}x${window.screen.height}` : '',
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        language: navigator.language || '',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+        userAgent: navigator.userAgent || ''
+      };
+    }
+
+    function track(eventName, value = '', props = {}) {
+      const elapsedSeconds = Math.round((Date.now() - pageStartedAt) / 1000);
+      const payload = new URLSearchParams({
+        vid: visitorId,
+        sid: sessionId,
+        to: campaign.to,
+        event: eventName,
+        value: String(value ?? ''),
+        page: location.pathname,
+        ref: document.referrer || '',
+        url: location.href,
+        props: JSON.stringify({
+          ...campaign,
+          elapsedSeconds,
+          ...props
+        })
+      });
+
+      // Image beacon avoids CORS issues and works with Apps Script doGet().
+      const beacon = new Image();
+      beacon.src = TRACKING_ENDPOINT + '?' + payload.toString();
+    }
+
+    track('page_view', '', getDeviceInfo());
+
+    // Time-on-page milestones
+    [5, 10, 30, 60, 120, 180].forEach(seconds => {
+      window.setTimeout(() => {
+        track(`stay_${seconds}s`, seconds);
+      }, seconds * 1000);
+    });
+
+    // Scroll depth milestones
+    const reachedScroll = new Set();
+    function recordScrollDepth() {
+      const doc = document.documentElement;
+      const scrollTop = window.scrollY || doc.scrollTop;
+      const viewportHeight = window.innerHeight || doc.clientHeight;
+      const fullHeight = Math.max(
+        doc.scrollHeight,
+        document.body.scrollHeight,
+        doc.offsetHeight,
+        document.body.offsetHeight
+      );
+      const depth = Math.min(100, Math.round(((scrollTop + viewportHeight) / fullHeight) * 100));
+
+      [25, 50, 75, 90, 100].forEach(threshold => {
+        if (depth >= threshold && !reachedScroll.has(threshold)) {
+          reachedScroll.add(threshold);
+          track(`scroll_${threshold}`, threshold);
+        }
+      });
+    }
+    window.addEventListener('scroll', recordScrollDepth, { passive: true });
+    window.addEventListener('resize', recordScrollDepth);
+    recordScrollDepth();
+
+    // Section visibility tracking
+    const seenSections = new Set();
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const name = entry.target.dataset.section;
+        if (!name || seenSections.has(name)) return;
+        seenSections.add(name);
+        track(`view_section_${name}`, '', { section: name });
+      });
+    }, { threshold: 0.45 });
+
+    document.querySelectorAll('[data-section]').forEach(el => observer.observe(el));
+
+    // Click tracking
+    document.addEventListener('click', event => {
+      const target = event.target.closest('[data-track]');
+      if (!target) return;
+
+      track(target.dataset.track, '', {
+        text: (target.innerText || target.textContent || '').trim().slice(0, 120),
+        href: target.href || '',
+        id: target.id || '',
+        classes: target.className || ''
+      });
+    });
+
+    // Copy current landing page URL
+    const toast = document.getElementById('toast');
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1600);
+    }
+
+    document.querySelector('[data-copy-link]')?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast('링크를 복사했습니다.');
+      } catch (error) {
+        showToast('복사에 실패했습니다. 주소창의 링크를 복사해 주세요.');
+      }
+    });
+
+    // Page exit tracking
+    let exitTracked = false;
+    function trackExit(reason) {
+      if (exitTracked) return;
+      exitTracked = true;
+      track('page_exit', Math.round((Date.now() - pageStartedAt) / 1000), {
+        reason,
+        scrollY: Math.round(window.scrollY || 0),
+        maxScrollEvents: Array.from(reachedScroll).sort((a, b) => a - b).join(',')
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        trackExit('visibility_hidden');
+      }
+    });
+
+    window.addEventListener('pagehide', () => trackExit('pagehide'));
+  </script>
+</body>
+</html>

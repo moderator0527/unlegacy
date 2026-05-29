@@ -615,6 +615,12 @@
 
     const NOTION_URL = 'https://buttery-raptorex-40b.notion.site/album-proposal-of-unlegacy-36e249f4585f80ee90e6dca47f63d08b';
     const pageParams = new URLSearchParams(window.location.search);
+    const DEBUG_TRACKING = pageParams.get('debug') === '1';
+
+    function debugLogTracking(message, data) {
+      if (!DEBUG_TRACKING) return;
+      console.log('[MODI tracking]', message, data || '');
+    }
 
     const campaign = {
       to: pageParams.get('to') || pageParams.get('recipient') || 'unknown',
@@ -631,22 +637,39 @@
       return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 12);
     }
 
+    function safeStorageGet(storage, key) {
+      try {
+        return storage.getItem(key);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function safeStorageSet(storage, key, value) {
+      try {
+        storage.setItem(key, value);
+      } catch (error) {
+        // Some privacy modes block localStorage/sessionStorage.
+        // Tracking still works for the current page view using in-memory IDs.
+      }
+    }
+
     function getOrCreateVisitorId() {
       const key = 'modi_unlegacy_visitor_id';
-      let id = localStorage.getItem(key);
+      let id = safeStorageGet(window.localStorage, key);
       if (!id) {
         id = safeRandomId('v');
-        localStorage.setItem(key, id);
+        safeStorageSet(window.localStorage, key, id);
       }
       return id;
     }
 
     function getOrCreateSessionId() {
       const key = 'modi_unlegacy_session_id';
-      let id = sessionStorage.getItem(key);
+      let id = safeStorageGet(window.sessionStorage, key);
       if (!id) {
         id = safeRandomId('s');
-        sessionStorage.setItem(key, id);
+        safeStorageSet(window.sessionStorage, key, id);
       }
       return id;
     }
@@ -665,6 +688,23 @@
       };
     }
 
+    // Keep tracking requests alive. Some browsers may cancel a locally scoped
+    // Image() request too aggressively, so we append it to a hidden container
+    // and remove it only after the request has had enough time to complete.
+    window.__modiTrackingBeacons = window.__modiTrackingBeacons || [];
+
+    function getBeaconContainer() {
+      let container = document.getElementById('modi-tracking-beacons');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'modi-tracking-beacons';
+        container.setAttribute('aria-hidden', 'true');
+        container.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;left:-9999px;top:-9999px;';
+        document.body.appendChild(container);
+      }
+      return container;
+    }
+
     function track(eventName, value = '', props = {}) {
       const elapsedSeconds = Math.round((Date.now() - pageStartedAt) / 1000);
       const payload = new URLSearchParams({
@@ -676,16 +716,40 @@
         page: location.pathname,
         ref: document.referrer || '',
         url: location.href,
+        ua: navigator.userAgent || '',
         props: JSON.stringify({
           ...campaign,
           elapsedSeconds,
           ...props
-        })
+        }),
+        // Cache buster. Without this, repeated GET/image requests can be cached
+        // by browser or intermediary cache and may not hit Apps Script every time.
+        _ts: String(Date.now()),
+        _r: Math.random().toString(36).slice(2)
       });
 
-      // Image beacon avoids CORS issues and works with Apps Script doGet().
-      const beacon = new Image();
-      beacon.src = TRACKING_ENDPOINT + '?' + payload.toString();
+      const requestUrl = TRACKING_ENDPOINT + '?' + payload.toString();
+      debugLogTracking('send', { eventName, recipient: campaign.to, requestUrl });
+
+      const beacon = new Image(1, 1);
+      beacon.referrerPolicy = 'no-referrer-when-downgrade';
+      beacon.alt = '';
+      beacon.style.cssText = 'width:1px;height:1px;opacity:0;position:absolute;pointer-events:none;';
+
+      const cleanup = () => {
+        window.setTimeout(() => {
+          const index = window.__modiTrackingBeacons.indexOf(beacon);
+          if (index >= 0) window.__modiTrackingBeacons.splice(index, 1);
+          if (beacon.parentNode) beacon.parentNode.removeChild(beacon);
+        }, 3000);
+      };
+
+      beacon.onload = cleanup;
+      beacon.onerror = cleanup;
+
+      window.__modiTrackingBeacons.push(beacon);
+      getBeaconContainer().appendChild(beacon);
+      beacon.src = requestUrl;
     }
 
     track('page_view', '', getDeviceInfo());
